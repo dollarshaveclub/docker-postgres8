@@ -8,8 +8,6 @@ sleep 5
 
 
 ./createdb postgres
-./createdb $POSTGRES_DATABASE
-
 
 if [ "$POSTGRES_USER" = 'postgres' ]; then
 	op='ALTER'
@@ -18,9 +16,11 @@ else
 fi
 
 ./psql --username postgres <<-EOSQL
-	$op USER "$POSTGRES_USER" WITH PASSWORD '$POSTGRES_PASSWORD' ;
+	$op USER "$POSTGRES_USER" WITH CREATEDB PASSWORD '$POSTGRES_PASSWORD' ;
 EOSQL
+
+./createdb --owner $POSTGRES_USER $POSTGRES_DATABASE
 
 ./pg_ctl -D ./../data stop
 
-exec "$@"
+./postmaster -D ./../data

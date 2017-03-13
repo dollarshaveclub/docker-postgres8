@@ -22,7 +22,5 @@ RUN ./initdb -D ./../data
 COPY ./postgresql.conf /usr/local/pgsql/data
 COPY ./pg_hba.conf /usr/local/pgsql/data
 
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ./postmaster -D ./../data
+CMD /docker-entrypoint.sh
 
