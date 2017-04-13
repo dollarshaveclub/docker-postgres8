@@ -11,8 +11,9 @@ WORKDIR /usr/local/postgres-install/postgresql-8.0.2
 
 RUN ./configure && make && make install && adduser postgres && mkdir /usr/local/pgsql/data && chown postgres /usr/local/pgsql/data
 
-COPY ./docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh && chown postgres /docker-entrypoint.sh
+COPY ./docker-entrypoint.sh /usr/local/bin/
+COPY ./db-setup.sh /usr/local/pgsql/bin
+RUN chmod +x /usr/local/pgsql/bin/db-setup.sh && chown postgres /usr/local/pgsql/bin/db-setup.sh
 
 USER postgres
 WORKDIR /usr/local/pgsql/bin
@@ -22,5 +23,8 @@ RUN ./initdb -D ./../data
 COPY ./postgresql.conf /usr/local/pgsql/data
 COPY ./pg_hba.conf /usr/local/pgsql/data
 
-CMD /docker-entrypoint.sh
+RUN ./db-setup.sh
 
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["./postmaster", "-D", "./../data"]
